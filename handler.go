@@ -10,6 +10,8 @@ import (
 
 // Router :
 type Router struct {
+	ErrorLog Logger
+
 	pathRegexp *regexp.Regexp
 	methodMap  map[string][]regexpCapture
 }
@@ -22,6 +24,14 @@ func NewRouter() *Router {
 	}
 }
 
+func (r *Router) logf(format string, args ...interface{}) {
+	if r.ErrorLog != nil {
+		r.ErrorLog.Printf(format, args...)
+	} else {
+		log.Printf(format, args...)
+	}
+}
+
 func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	path := req.URL.Path
 	rcs := r.methodMap[req.Method]
@@ -29,7 +39,7 @@ func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		params, err := rc.MatchPath(path)
 		if err != nil {
 			if err != Errdidnotmatch {
-				log.Printf("error: %q", err)
+				r.logf("ServeHTTP error: %q", err)
 			}
 			continue
 		}
