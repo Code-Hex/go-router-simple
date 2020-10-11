@@ -6,6 +6,8 @@ go-router-simple is a simple HTTP request router for [Go](https://golang.org/). 
 
 **Motivation:** Most request routing third-party modules in Go are implemented using the trie (radix) tree algorithm. Hence, they are fast but it hard to provide flexible URL parameters. (e.g. URL paths containing `/`)
 
+⚠️ **Supports Go1.12 and above.**
+
 ## Synopsis
 
 ```go
