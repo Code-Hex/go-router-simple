@@ -15,7 +15,7 @@ func Test_createPathMatcher(t *testing.T) {
 	}{
 		{
 			path:      `/blog/:year/:month`,
-			wantRegex: `/blog/([^/]+)/([^/]+)`,
+			wantRegex: `^/blog/([^/]+)/([^/]+)$`,
 			wantCaptures: []string{
 				"year",
 				"month",
@@ -23,7 +23,7 @@ func Test_createPathMatcher(t *testing.T) {
 		},
 		{
 			path:      `/blog/{year}/{month}`,
-			wantRegex: `/blog/([^/]+)/([^/]+)`,
+			wantRegex: `^/blog/([^/]+)/([^/]+)$`,
 			wantCaptures: []string{
 				"year",
 				"month",
@@ -31,7 +31,7 @@ func Test_createPathMatcher(t *testing.T) {
 		},
 		{
 			path:      `/say/*/to/*`,
-			wantRegex: `/say/(.+)/to/(.+)`,
+			wantRegex: `^/say/(.+)/to/(.+)$`,
 			wantCaptures: []string{
 				wildcardKey,
 				wildcardKey,
@@ -39,7 +39,7 @@ func Test_createPathMatcher(t *testing.T) {
 		},
 		{
 			path:      `/download/*.*`,
-			wantRegex: `/download/(.+)\.(.+)`,
+			wantRegex: `^/download/(.+)\.(.+)$`,
 			wantCaptures: []string{
 				wildcardKey,
 				wildcardKey,
@@ -47,28 +47,28 @@ func Test_createPathMatcher(t *testing.T) {
 		},
 		{
 			path:      `/blog/{year:\d{4}}`,
-			wantRegex: `/blog/(\d{4})`,
+			wantRegex: `^/blog/(\d{4})$`,
 			wantCaptures: []string{
 				"year",
 			},
 		},
 		{
 			path:      `/blog/{\d{4}}`,
-			wantRegex: `/blog/([^/]+)`,
+			wantRegex: `^/blog/([^/]+)$`,
 			wantCaptures: []string{
 				`\d{4}`,
 			},
 		},
 		{
 			path:      `/hi/{user:.*}`,
-			wantRegex: `/hi/(.*)`,
+			wantRegex: `^/hi/(.*)$`,
 			wantCaptures: []string{
 				"user",
 			},
 		},
 		{
 			path:      `/blog/{year:(?:199\d|20\d{2})}/{month:(?:0?[1-9]|1[0-2])}`,
-			wantRegex: `/blog/((?:199\d|20\d{2}))/((?:0?[1-9]|1[0-2]))`,
+			wantRegex: `^/blog/((?:199\d|20\d{2}))/((?:0?[1-9]|1[0-2]))$`,
 			wantCaptures: []string{
 				"year",
 				"month",
@@ -101,9 +101,9 @@ func Test_regexpCapture_MatchPath(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "/blog/([^/]+)/([^/]+)",
+			name: "^/blog/([^/]+)/([^/]+)$",
 			fields: fields{
-				rg: regexp.MustCompile(`/blog/([^/]+)/([^/]+)`),
+				rg: regexp.MustCompile(`^/blog/([^/]+)/([^/]+)$`),
 				captures: []string{
 					"year",
 					"month",
@@ -119,9 +119,9 @@ func Test_regexpCapture_MatchPath(t *testing.T) {
 			},
 		},
 		{
-			name: "/say/(.+)/to/(.+)",
+			name: "^/say/(.+)/to/(.+)$",
 			fields: fields{
-				rg: regexp.MustCompile(`/say/(.+)/to/(.+)`),
+				rg: regexp.MustCompile(`^/say/(.+)/to/(.+)$`),
 				captures: []string{
 					wildcardKey,
 					wildcardKey,
@@ -137,9 +137,9 @@ func Test_regexpCapture_MatchPath(t *testing.T) {
 			},
 		},
 		{
-			name: `/download/(.+)\.(.+)`,
+			name: `^/download/(.+)\.(.+)$`,
 			fields: fields{
-				rg: regexp.MustCompile(`/download/(.+)\.(.+)`),
+				rg: regexp.MustCompile(`^/download/(.+)\.(.+)$`),
 				captures: []string{
 					wildcardKey,
 					wildcardKey,
@@ -155,9 +155,9 @@ func Test_regexpCapture_MatchPath(t *testing.T) {
 			},
 		},
 		{
-			name: `/blog/([^/]+)`,
+			name: `^/blog/([^/]+)$`,
 			fields: fields{
-				rg: regexp.MustCompile(`/blog/([^/]+)`),
+				rg: regexp.MustCompile(`^/blog/([^/]+)$`),
 				captures: []string{
 					`\d{4}`,
 				},
@@ -171,9 +171,9 @@ func Test_regexpCapture_MatchPath(t *testing.T) {
 			},
 		},
 		{
-			name: `/blog/(\d{4})`,
+			name: `^/blog/(\d{4})$`,
 			fields: fields{
-				rg: regexp.MustCompile(`/blog/(\d{4})`),
+				rg: regexp.MustCompile(`^/blog/(\d{4})$`),
 				captures: []string{
 					"year",
 				},
@@ -187,9 +187,9 @@ func Test_regexpCapture_MatchPath(t *testing.T) {
 			},
 		},
 		{
-			name: `/hi/(.*)`,
+			name: `^/hi/(.*)$`,
 			fields: fields{
-				rg: regexp.MustCompile(`/hi/(.*)`),
+				rg: regexp.MustCompile(`^/hi/(.*)$`),
 				captures: []string{
 					"user",
 				},
@@ -203,9 +203,9 @@ func Test_regexpCapture_MatchPath(t *testing.T) {
 			},
 		},
 		{
-			name: `/blog/((?:199\d|20\d{2}))/((?:0?[1-9]|1[0-2]))`,
+			name: `^/blog/((?:199\d|20\d{2}))/((?:0?[1-9]|1[0-2]))$`,
 			fields: fields{
-				rg: regexp.MustCompile(`/blog/((?:199\d|20\d{2}))/((?:0?[1-9]|1[0-2]))`),
+				rg: regexp.MustCompile(`^/blog/((?:199\d|20\d{2}))/((?:0?[1-9]|1[0-2]))$`),
 				captures: []string{
 					"year",
 					"month",
