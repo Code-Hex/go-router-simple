@@ -43,9 +43,16 @@ var (
 	}
 )
 
-// Router :
+// Router is a http.Handler which can be used to dispatch requests to different
+// handler functions via configurable routes
 type Router struct {
+	// ErrorLog logs error in ServeHTTP. If not specified, it defaults
+	// to log.Printf is used.
 	ErrorLog Logger
+
+	// NotFound is configurable http.Handler which is called when no matching
+	// route is found. If it is not set, http.NotFound is used.
+	NotFound http.Handler
 
 	pathRegexp *regexp.Regexp
 	methodMap  map[string][]regexpCapture
@@ -82,6 +89,13 @@ func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		ctx := contextWithParams(req.Context(), params)
 		rc.handler.ServeHTTP(w, req.WithContext(ctx))
 		return
+	}
+
+	// Handle 404
+	if r.NotFound != nil {
+		r.NotFound.ServeHTTP(w, req)
+	} else {
+		http.NotFound(w, req)
 	}
 }
 
