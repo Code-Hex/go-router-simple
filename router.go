@@ -58,8 +58,8 @@ type Router struct {
 	methodMap  map[string][]regexpCapture
 }
 
-// NewRouter creates new Router struct.
-func NewRouter() *Router {
+// New creates new Router struct.
+func New() *Router {
 	return &Router{
 		pathRegexp: re,
 		methodMap:  make(map[string][]regexpCapture, 9), // num methods
@@ -133,6 +133,7 @@ func (rc regexpCapture) MatchPath(path string) (*params, error) {
 
 func createPathMatcher(path string) (regex string, captures []string) {
 	var b strings.Builder
+	b.WriteString("^")
 	submatches := re.FindAllStringSubmatch(path, -1)
 	for _, submatch := range submatches {
 		for idx, match := range submatch[1:] {
@@ -145,6 +146,7 @@ func createPathMatcher(path string) (regex string, captures []string) {
 			}
 		}
 	}
+	b.WriteString("$")
 	return b.String(), captures
 }
 
