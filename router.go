@@ -7,9 +7,11 @@ package router
 import (
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
 	"regexp"
 	"strings"
+	"sync"
 )
 
 const (
@@ -24,24 +26,62 @@ const (
 // errdidnotmatch represents did not match to any regex
 var errdidnotmatch = errors.New("did not match")
 
-var re = regexp.MustCompile(
-	strings.Join([]string{
-		pattern1,
-		pattern2,
-		pattern3,
-		pattern4,
-	}, "|"),
+var (
+	re = regexp.MustCompile(
+		strings.Join([]string{
+			pattern1,
+			pattern2,
+			pattern3,
+			pattern4,
+		}, "|"),
+	)
+
+	paramsPool = sync.Pool{
+		New: func() interface{} {
+			return newParams()
+		},
+	}
 )
 
-type params struct {
-	wildcards []string
-	capture   map[string]string
+// Router :
+type Router struct {
+	ErrorLog Logger
+
+	pathRegexp *regexp.Regexp
+	methodMap  map[string][]regexpCapture
 }
 
-func newParams() *params {
-	return &params{
-		wildcards: make([]string, 0),
-		capture:   make(map[string]string, 0),
+// NewRouter creates new Router struct.
+func NewRouter() *Router {
+	return &Router{
+		pathRegexp: re,
+		methodMap:  make(map[string][]regexpCapture, 9), // num methods
+	}
+}
+
+func (r *Router) logf(format string, args ...interface{}) {
+	if r.ErrorLog != nil {
+		r.ErrorLog.Printf(format, args...)
+	} else {
+		log.Printf(format, args...)
+	}
+}
+
+func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+	path := req.URL.Path
+	rcs := r.methodMap[req.Method]
+	for _, rc := range rcs {
+		params, err := rc.MatchPath(path)
+		if err != nil {
+			if err != errdidnotmatch {
+				r.logf("ServeHTTP error: %q", err)
+			}
+			continue
+		}
+		defer putParams(params)
+		ctx := contextWithParams(req.Context(), params)
+		rc.handler.ServeHTTP(w, req.WithContext(ctx))
+		return
 	}
 }
 
@@ -66,7 +106,7 @@ func (rc regexpCapture) MatchPath(path string) (*params, error) {
 		return nil, fmt.Errorf("parameter mismatch with regexp: %q", regex.String())
 	}
 	// NOTE(codehex): I guess better use sync.Pool
-	params := newParams()
+	params := getParams()
 	for i, capture := range rc.captures {
 		if capture == wildcardKey {
 			params.wildcards = append(params.wildcards, matches[i])
@@ -109,4 +149,36 @@ func replacePattern(index int, s string) (string, string) {
 		return "(.+)", wildcardKey
 	}
 	return regexp.QuoteMeta(s), ""
+}
+
+type params struct {
+	wildcards []string
+	capture   map[string]string
+}
+
+func newParams() *params {
+	return &params{
+		wildcards: make([]string, 0),
+		capture:   make(map[string]string, 0),
+	}
+}
+
+func (p *params) reset() {
+	wildcards := p.wildcards
+	p.wildcards = wildcards[0:0]
+	for key := range p.capture {
+		delete(p.capture, key)
+	}
+}
+
+func getParams() *params {
+	ps := paramsPool.Get().(*params)
+	ps.reset()
+	return ps
+}
+
+func putParams(ps *params) {
+	if ps != nil {
+		paramsPool.Put(ps)
+	}
 }

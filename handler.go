@@ -5,51 +5,9 @@ package router
 import (
 	"context"
 	"fmt"
-	"log"
 	"net/http"
 	"regexp"
 )
-
-// Router :
-type Router struct {
-	ErrorLog Logger
-
-	pathRegexp *regexp.Regexp
-	methodMap  map[string][]regexpCapture
-}
-
-// NewRouter creates new Router struct.
-func NewRouter() *Router {
-	return &Router{
-		pathRegexp: re,
-		methodMap:  make(map[string][]regexpCapture, 9), // num methods
-	}
-}
-
-func (r *Router) logf(format string, args ...interface{}) {
-	if r.ErrorLog != nil {
-		r.ErrorLog.Printf(format, args...)
-	} else {
-		log.Printf(format, args...)
-	}
-}
-
-func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
-	path := req.URL.Path
-	rcs := r.methodMap[req.Method]
-	for _, rc := range rcs {
-		params, err := rc.MatchPath(path)
-		if err != nil {
-			if err != errdidnotmatch {
-				r.logf("ServeHTTP error: %q", err)
-			}
-			continue
-		}
-		ctx := contextWithParams(req.Context(), params)
-		rc.handler.ServeHTTP(w, req.WithContext(ctx))
-		return
-	}
-}
 
 // Handle handles handler
 func (r *Router) Handle(method, path string, handler http.Handler) {
