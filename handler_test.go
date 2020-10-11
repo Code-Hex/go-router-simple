@@ -8,7 +8,7 @@ import (
 
 func TestHandler(t *testing.T) {
 	router := NewRouter()
-	err := router.HandleFunc("GET",
+	router.HandleFunc("GET",
 		"/blog/:year/:month",
 		func(w http.ResponseWriter, r *http.Request) {
 			ctx := r.Context()
@@ -19,9 +19,7 @@ func TestHandler(t *testing.T) {
 			w.Write([]byte("OK"))
 		},
 	)
-	if err != nil {
-		t.Fatal(err)
-	}
+
 	srv := httptest.NewServer(router)
 
 	resp, err := http.Get(srv.URL + "/blog/2020/10")
