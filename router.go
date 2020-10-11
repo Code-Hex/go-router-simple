@@ -58,11 +58,11 @@ func (rc regexpCapture) MatchPath(path string) (*params, error) {
 		return nil, errdidnotmatch
 	}
 	matches = matches[1:]
-	// Should not contain parenthesis in regexp pattern
-	//
-	// Good: "/{date:(?:\d+)}"
-	// Bad:  "/{date:(\d+)}"
 	if len(rc.captures) > 0 && len(matches) != len(rc.captures) {
+		// Should not contain parenthesis in regexp pattern
+		//
+		// Good: "/{date:(?:\d+)}"
+		// Bad:  "/{date:(\d+)}"
 		return nil, fmt.Errorf("parameter mismatch with regexp: %q", regex.String())
 	}
 	// NOTE(codehex): I guess better use sync.Pool
