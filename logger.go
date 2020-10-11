@@ -1,3 +1,5 @@
+// +build go1.12
+
 package router
 
 // Logger interface represents error logger.
