@@ -21,8 +21,8 @@ const (
 	wildcardKey = "__splat__"
 )
 
-// Errdidnotmatch represents did not match to any regex
-var Errdidnotmatch = errors.New("did not match")
+// errdidnotmatch represents did not match to any regex
+var errdidnotmatch = errors.New("did not match")
 
 var re = regexp.MustCompile(
 	strings.Join([]string{
@@ -55,7 +55,7 @@ func (rc regexpCapture) MatchPath(path string) (*params, error) {
 	regex := rc.rg
 	matches := regex.FindStringSubmatch(path)
 	if len(matches) == 0 {
-		return nil, Errdidnotmatch
+		return nil, errdidnotmatch
 	}
 	matches = matches[1:]
 	// Should not contain parenthesis in regexp pattern
