@@ -1,6 +1,6 @@
 go-router-simple
 =====
-[![PkgGoDev](https://pkg.go.dev/badge/github.com/Code-Hex/go-router-simple)](https://pkg.go.dev/github.com/Code-Hex/go-router-simple)
+![test](https://github.com/Code-Hex/go-router-simple/workflows/test/badge.svg) [![PkgGoDev](https://pkg.go.dev/badge/github.com/Code-Hex/go-router-simple)](https://pkg.go.dev/github.com/Code-Hex/go-router-simple) [![Go Report Card](https://goreportcard.com/badge/github.com/Code-Hex/go-router-simple)](https://goreportcard.com/report/github.com/Code-Hex/go-router-simple)
 
 go-router-simple is a simple HTTP request router for [Go](https://golang.org/). This package is ported from [Router::Simple](https://metacpan.org/pod/Router::Simple) which is a great module in Perl.
 
