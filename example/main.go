@@ -31,6 +31,7 @@ func main() {
 	log.Fatal(http.ListenAndServe(":8080", hr))
 }
 
+// Blog handler
 func Blog() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		year := router.ParamFromContext(r.Context(), "year")
