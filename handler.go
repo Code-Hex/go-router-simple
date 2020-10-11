@@ -40,7 +40,7 @@ func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	for _, rc := range rcs {
 		params, err := rc.MatchPath(path)
 		if err != nil {
-			if err != Errdidnotmatch {
+			if err != errdidnotmatch {
 				r.logf("ServeHTTP error: %q", err)
 			}
 			continue
