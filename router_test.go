@@ -53,6 +53,13 @@ func Test_createPathMatcher(t *testing.T) {
 			},
 		},
 		{
+			path:      `/blog/{\d{4}}`,
+			wantRegex: `/blog/([^/]+)`,
+			wantCaptures: []string{
+				`\d{4}`,
+			},
+		},
+		{
 			path:      `/hi/{user:.*}`,
 			wantRegex: `/hi/(.*)`,
 			wantCaptures: []string{
@@ -145,6 +152,22 @@ func Test_regexpCapture_MatchPath(t *testing.T) {
 					"xml",
 				},
 				capture: map[string]string{},
+			},
+		},
+		{
+			name: `/blog/([^/]+)`,
+			fields: fields{
+				rg: regexp.MustCompile(`/blog/([^/]+)`),
+				captures: []string{
+					`\d{4}`,
+				},
+			},
+			path: "/blog/2018",
+			want: &params{
+				wildcards: []string{},
+				capture: map[string]string{
+					`\d{4}`: "2018",
+				},
 			},
 		},
 		{

@@ -6,6 +6,7 @@ package router
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"regexp"
 	"strings"
@@ -57,8 +58,12 @@ func (rc regexpCapture) MatchPath(path string) (*params, error) {
 		return nil, Errdidnotmatch
 	}
 	matches = matches[1:]
-	if len(matches) != len(rc.captures) {
-		return nil, errors.New("parameter mismatch with regexp")
+	// Should not contain parenthesis in regexp pattern
+	//
+	// Good: "/{date:(?:\d+)}"
+	// Bad:  "/{date:(\d+)}"
+	if len(rc.captures) > 0 && len(matches) != len(rc.captures) {
+		return nil, fmt.Errorf("parameter mismatch with regexp: %q", regex.String())
 	}
 	// NOTE(codehex): I guess better use sync.Pool
 	params := newParams()
