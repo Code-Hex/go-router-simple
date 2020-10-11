@@ -22,7 +22,7 @@ type Router struct {
 func NewRouter() *Router {
 	return &Router{
 		pathRegexp: re,
-		methodMap:  make(map[string][]regexpCapture, 6),
+		methodMap:  make(map[string][]regexpCapture, 9), // num methods
 	}
 }
 
