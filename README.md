@@ -105,3 +105,17 @@ func Blog() http.Handler {
 	})
 }
 ```
+
+<details>
+<summary>Result</summary>
+
+```
+$ curl localhost:8080/hi/codehex
+Welcome! "codehex"
+$ curl localhost:8080/bye/codehex
+Bye! "codehex"
+$ curl localhost:8080/blog/2020/11
+Render: "2020/11"
+```
+
+</details>
